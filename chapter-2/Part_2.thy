@@ -48,7 +48,8 @@ theorem count_lte_length : "count x xs \<le> length xs"
   done
 
 fun snoc :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list" where
-"snoc xs a = xs@(a#Nil)"
+"snoc [] a = [a]" |
+"snoc (x#xs) a = x # (snoc xs a)"
 
 fun reverse :: "'a list \<Rightarrow> 'a list" where
 "reverse [] = []" |
@@ -62,4 +63,4 @@ lemma reverse_snoc [simp] : "reverse (snoc xs a) = a # reverse xs"
 theorem reverse_reverse : "reverse (reverse xs) = xs"
   apply(induction xs)
    apply(auto)
-  sorry
+  done
