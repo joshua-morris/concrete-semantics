@@ -64,3 +64,12 @@ theorem reverse_reverse : "reverse (reverse xs) = xs"
   apply(induction xs)
    apply(auto)
   done
+
+fun sum_upto :: "nat \<Rightarrow> nat" where
+"sum_upto 0 = 0" |
+"sum_upto m = m + sum_upto (m - 1)"
+
+theorem triangle_number : "sum_upto n = n * (n + 1) div 2"
+  apply(induction n)
+   apply(auto)
+  done
