@@ -43,3 +43,5 @@ theorem "map f (intersperse a xs) = intersperse (f a) (map f xs)"
   apply(induction xs)
    apply(auto)
   done
+
+end

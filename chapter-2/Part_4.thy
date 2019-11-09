@@ -1,15 +1,6 @@
-theory Part_4 imports Main
+theory Part_4 imports Main Part_2
 
 begin
-
-fun add :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
-"add 0 n = n" |
-"add (Suc m) n = Suc (add m n)"
-
-lemma suc_associative [simp] : "add m (Suc n) = Suc (add m n)"
-  apply(induction m)
-   apply(auto)
-  done
 
 fun itadd :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
 "itadd 0 n = n" |
