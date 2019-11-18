@@ -33,3 +33,5 @@ next
   moreover have "length ys = length zs + 1" by (simp add: "1" "2" ks)
   ultimately show ?thesis by blast
 qed
+
+end
