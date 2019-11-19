@@ -87,33 +87,4 @@ corollary SeqT: "S w \<longleftrightarrow> T w"
   apply(auto intro: ST TS)
   done
 
-(* 4.6 *)
-
-type_synonym vname = string
-datatype aexp = N int | V vname | Plus aexp aexp
-
-type_synonym val = int
-type_synonym state = "vname \<Rightarrow> val"
-
-fun aval :: "aexp \<Rightarrow> state \<Rightarrow> val" where
-"aval (N a) s = a" |
-"aval (V x) s = s x" |
-"aval (Plus a b) s = aval a s + aval b s"
-
-inductive aval_rel :: "aexp \<Rightarrow> state \<Rightarrow> val \<Rightarrow> bool" where
-ConstN: "aval_rel (N c) s c" |
-ValV: "aval_rel (V x) s (s x)" |
-PlusX: "aval_rel p s x \<Longrightarrow> aval_rel q s y \<Longrightarrow> aval_rel (Plus p q) s (x + y)"
-
-lemma aval_rel_aval: "aval_rel c s v \<Longrightarrow> aval c s = v"
-  apply(induction rule: aval_rel.induct)
-  sorry
-(* TODO *)
-
-lemma aval_aval_rel: "aval c s = v \<Longrightarrow> aval_rel c s v"
-  sorry
-
-corollary "aval_rel c s v \<longleftrightarrow> aval c s = v"
-  sorry
-  
-  
+    
