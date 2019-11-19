@@ -99,11 +99,47 @@ lemma TS : "T w \<Longrightarrow> S w"
    apply(auto intro: S0 S1 S2)
   done
 
-lemma [simp] : "T w \<Longrightarrow> T x \<Longrightarrow> T (w @ x)"
-  apply(induction rule: T.induct)
-   apply(auto)
-
-
 lemma ST : "S w \<Longrightarrow> T w"
-  apply(induction rule: S.induct)
-    apply(simp add: T0)
+proof (induction rule: S.induct)
+  case S0
+  thus ?case by (simp add: T0)
+next
+  case S1
+  thus ?case using T1 by blast
+next
+  case S2
+  thus ?case using T1 by blast
+qed
+
+corollary SeqT: "S w \<longleftrightarrow> T w"
+  apply(auto intro: ST TS)
+  done
+
+fun balanced :: "nat \<Rightarrow> alpha list \<Rightarrow> bool" where
+"balanced 0 w = S w" |
+"balanced n w = balanced (n - 1) (a # w)"
+
+corollary "balanced n w \<longleftrightarrow> S (replicate n a @ w)" (is "?P \<longleftrightarrow> ?Q")
+proof
+  assume "?P"
+  from this show "?Q"
+  proof (induction n)
+    case 0
+    thus ?case by simp
+  next
+    case (Suc m)
+    thus ?case using S0 and S2 by blast
+  qed
+next
+  assume "?Q"
+  from this show "?P"
+  proof (induction n)
+    case 0
+    thus ?case by auto
+  next
+    case (Suc m)
+    thus ?case using S0 and S1 and S2 by blast
+  qed
+qed
+
+end
