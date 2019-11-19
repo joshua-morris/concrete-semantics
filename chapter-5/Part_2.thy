@@ -72,3 +72,38 @@ next
       by (metis Cons.IH Cons_eq_appendI Un_iff \<open>a \<noteq> x\<close> \<open>x \<in> elems xs\<close> elems.simps(2) ex_in_conv insert_iff)
   qed
 qed
+
+(* 5.7 *)
+
+datatype alpha = a | b (* a == '(', b == ')' *)
+
+(* 
+Grammar for balanced parentheses S
+  S \<rightarrow> \<epsilon> | aSb | SS
+*)
+inductive S :: "alpha list \<Rightarrow> bool" where
+S0: "S []" |
+S1: "S w \<Longrightarrow> S (a # w @ [b])" (*S [a,b,a,b] \<rightarrow> S [a,b] \<rightarrow> S [] \<rightarrow> true *) |
+S2: "S w \<Longrightarrow> S x \<Longrightarrow> S (w @ x)" (* S [a,b,a,b] \<rightarrow> S [a,b] \<and> S [a,b] \<rightarrow> true *)
+
+(* 
+Second grammar for balanced parentheses T
+  T \<rightarrow> \<epsilon> | TaTb 
+*)
+inductive T :: "alpha list \<Rightarrow> bool" where
+T0: "T []" |
+T1: "T w \<Longrightarrow> T x \<Longrightarrow> T (w @ [a] @ x @ [b])"
+
+lemma TS : "T w \<Longrightarrow> S w"
+  apply(induction rule: T.induct)
+   apply(auto intro: S0 S1 S2)
+  done
+
+lemma [simp] : "T w \<Longrightarrow> T x \<Longrightarrow> T (w @ x)"
+  apply(induction rule: T.induct)
+   apply(auto)
+
+
+lemma ST : "S w \<Longrightarrow> T w"
+  apply(induction rule: S.induct)
+    apply(simp add: T0)
