@@ -1,6 +1,8 @@
 theory Part_3 imports Main
 begin
 
+(* 2.6 *)
+
 datatype 'a tree = Tip | Node "'a tree" 'a "'a tree"
 
 fun contents :: "'a tree \<Rightarrow> 'a list" where
@@ -15,6 +17,8 @@ theorem "sum_tree t = sum_list (contents t)"
   apply(induction t)
    apply(auto)
   done
+
+(* 2.7 *)
 
 datatype 'a tree2 = Tip 'a | Node "'a tree2" 'a "'a tree2"
 
@@ -34,6 +38,8 @@ theorem "pre_order (mirror t) = rev (post_order t)"
   apply(induction t)
    apply(auto)
   done
+
+(* 2.8 *)
 
 fun intersperse :: "'a \<Rightarrow> 'a list \<Rightarrow> 'a list" where
 "intersperse a [] = [a]" |

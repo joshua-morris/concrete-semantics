@@ -38,6 +38,8 @@ lemma aval_plus[simp] : "aval (plus a1 a2) s = aval a1 s + aval a2 s"
     apply auto
   done
 
+(* 3.1 *)
+
 fun optimal :: "aexp \<Rightarrow> bool" where
 "optimal (N a) = True" |
 "optimal (V x) = True" |
@@ -48,6 +50,8 @@ lemma is_optimal : "optimal (asimp_const a)"
   apply(induction a)
     apply(auto simp add: aexp.split)
   done
+
+(* 3.2 *)
 
 fun sumN :: "aexp \<Rightarrow> int" where
 "sumN (N a) = a" |
@@ -80,6 +84,8 @@ lemma aval_full_asimp : "aval (full_asimp t) s = aval t s"
     apply(auto)
   done
 
+(* 3.3 *)
+
 fun subst :: "vname \<Rightarrow> aexp \<Rightarrow> aexp \<Rightarrow> aexp" where
 "subst x a (V v) = (if x = v then a else (V v))" |
 "subst x a (Plus m n) = Plus (subst x a m) (subst x a n)" |
@@ -93,6 +99,8 @@ lemma subst_lemma [simp] : "aval (subst x a e) s = aval e (s(x := aval a s))"
 lemma "aval a1 s = aval a2 s \<Longrightarrow> aval (subst x a1 e) s = aval (subst x a2 e) s"
   apply(auto)
   done
+
+(* 3.4 *)
 
 datatype aexp2 = N2 int | V2 vname | Plus2 aexp2 aexp2 | Times aexp2 aexp2
 
@@ -135,3 +143,5 @@ lemma aval2_asimp [simp] : "aval2 (asimp2 a) s = aval2 a s"
   apply(induction a)
      apply(auto simp add: aexp2.split)
   done
+
+(* TODO *)

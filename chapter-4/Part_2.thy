@@ -2,6 +2,8 @@ theory Part_2 imports Main
 
 begin
 
+(* 4.2 *)
+
 inductive palindrome :: "'a list \<Rightarrow> bool" where
 pempty: "palindrome []" |
 psingle: "palindrome [x]" |
@@ -11,6 +13,8 @@ lemma "palindrome xs \<Longrightarrow> rev xs = xs"
   apply(induction rule: palindrome.induct)
     apply(auto)
   done
+
+(* 4.3 *)
 
 inductive star :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" for r where
 refl: "star r x x" |
@@ -29,6 +33,8 @@ theorem star_star' : "star r x y \<Longrightarrow> star' r x y"
   apply(induction rule: star.induct)
    apply(auto simp add: refl')
   done
+
+(* TODO *)
 
    
   

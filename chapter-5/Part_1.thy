@@ -2,6 +2,8 @@ theory Part_1 imports Main
 
 begin
 
+(* 5.1 *)
+
 lemma assumes T: "\<forall>x y. T x y \<or> T y x"
   and A: "\<forall>x y. A x y \<and> A y x \<longrightarrow> x = y"
   and TA: "\<forall>x y. T x y \<longrightarrow> A x y" and "A x y"
@@ -13,6 +15,8 @@ proof (rule ccontr)
   from this and `A x y` and A have "x = y" by blast
   from this and `\<not> T x y` and `T y x` show "False" by blast
 qed
+
+(* 5.2 *)
 
 lemma "(\<exists> ys zs. xs = ys @ zs \<and> length ys = length zs)
   \<or> (\<exists> ys zs. xs = ys @ zs \<and> length ys = length zs + 1)"

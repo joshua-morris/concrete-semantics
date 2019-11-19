@@ -6,6 +6,8 @@ inductive ev :: "nat \<Rightarrow> bool" where
 ev0: "ev 0" |
 evSS: "ev n \<Longrightarrow> ev(Suc(Suc n))"
 
+(* 5.3 *)
+
 lemma assumes a: "ev(Suc(Suc n))" shows "ev n"
 proof -
   show ?thesis using a
@@ -14,12 +16,16 @@ proof -
   qed
 qed
 
+(* 5.4 *)
+
 lemma "\<not> ev(Suc(Suc(Suc 0)))" (is "\<not> ?P")
 proof
   assume "?P"
   hence "ev (Suc 0)" using ev.cases by blast
   thus "False" using ev.cases by blast
 qed
+
+(* 5.5 *)
 
 inductive star :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> 'a \<Rightarrow> bool" for r where
 refl: "star r x x" |
@@ -37,6 +43,8 @@ next
   case it_SS
   thus ?case by (meson star.step)
 qed
+
+(* 5.6 *)
 
 fun elems :: "'a list \<Rightarrow> 'a set" where
 "elems [] = {}" |
@@ -64,5 +72,3 @@ next
       by (metis Cons.IH Cons_eq_appendI Un_iff \<open>a \<noteq> x\<close> \<open>x \<in> elems xs\<close> elems.simps(2) ex_in_conv insert_iff)
   qed
 qed
-
-end

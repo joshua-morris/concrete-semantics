@@ -2,6 +2,8 @@ theory Part_1 imports Main
 
 begin
 
+(* 4.1 *)
+
 datatype 'a tree = Tip | Node "'a tree" 'a "'a tree"
 
 fun set :: "'a tree \<Rightarrow> 'a set" where

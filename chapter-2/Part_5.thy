@@ -2,6 +2,8 @@ theory Part_5 imports Main
 
 begin
 
+(* 2.10 *)
+
 datatype tree0 = Tip | Node "tree0" "tree0"
 
 fun nodes :: "tree0 \<Rightarrow> nat" where
@@ -17,6 +19,8 @@ theorem explode_size : "nodes (explode n t) = (2 ^ n) * (nodes t) + (2 ^ n - 1)"
    apply(auto simp add: algebra_simps)
   done
 
+(* 2.11 *)
+
 datatype exp = Var | Const int | Add exp exp | Mult exp exp
 
 fun eval :: "exp \<Rightarrow> int \<Rightarrow> int" where
@@ -29,3 +33,4 @@ fun evalp :: "int list \<Rightarrow> int \<Rightarrow> int" where
 "evalp [] n = 0" |
 "evalp (x#xs) n = x * n ^ (size xs) + evalp xs n"
 
+(* TODO *)

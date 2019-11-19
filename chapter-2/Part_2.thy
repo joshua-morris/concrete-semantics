@@ -1,10 +1,14 @@
 theory Part_2 imports Main
 begin
 
+(* 2.1 *)
+
 value "1 + (2::nat)"
 value "1 + (2::int)"
 value "1 - (2::nat)"
 value "1 - (2::int)"
+
+(* 2.2 *)
 
 fun add :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
 "add 0 n = n" |
@@ -38,6 +42,8 @@ lemma double_is_add : "double m = m + m"
   apply(auto)
   done
 
+(* 2.3 *)
+
 fun count :: "'a \<Rightarrow> 'a list \<Rightarrow> nat" where
 "count a [] = 0" |
 "count a (x#xs) = (if a = x then (1 + count a xs) else (count a xs))"
@@ -46,6 +52,8 @@ theorem count_lte_length : "count x xs \<le> length xs"
   apply(induction xs)
    apply(auto)
   done
+
+(* 2.4 *)
 
 fun snoc :: "'a list \<Rightarrow> 'a \<Rightarrow> 'a list" where
 "snoc [] a = [a]" |
@@ -64,6 +72,8 @@ theorem reverse_reverse : "reverse (reverse xs) = xs"
   apply(induction xs)
    apply(auto)
   done
+
+(* 2.5 *)
 
 fun sum_upto :: "nat \<Rightarrow> nat" where
 "sum_upto 0 = 0" |
