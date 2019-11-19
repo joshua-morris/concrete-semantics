@@ -86,4 +86,21 @@ qed
 corollary SeqT: "S w \<longleftrightarrow> T w"
   apply(auto intro: ST TS)
   done
-    
+
+(* 4.6 *)
+
+type_synonym vname = string
+datatype aexp = N int | V vname | Plus aexp aexp
+
+type_synonym val = int
+type_synonym state = "vname \<Rightarrow> val"
+
+fun aval :: "aexp \<Rightarrow> state \<Rightarrow> val" where
+"aval (N a) s = a" |
+"aval (V x) s = s x" |
+"aval (Plus a b) s = aval a s + aval b s"
+
+inductive aval_rel :: "aexp \<Rightarrow> state \<Rightarrow> val \<Rightarrow> bool" where
+ConstN: "aval_rel (N c) s c" |
+ValV: "aval_rel (V x) s (s x)"
+(* TODO *)
