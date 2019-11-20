@@ -144,4 +144,26 @@ lemma aval2_asimp [simp] : "aval2 (asimp2 a) s = aval2 a s"
      apply(auto simp add: aexp2.split)
   done
 
+(* 3.6 *)
+
+datatype lexp = Nl int | Vl vname | Plusl lexp lexp | LET vname lexp lexp
+
+fun lval :: "lexp \<Rightarrow> state \<Rightarrow> int" where
+"lval (Nl a) _ = a" |
+"lval (Vl x) s = s x" |
+"lval (Plusl a\<^sub>1 a\<^sub>2) s = (lval a\<^sub>1 s) + (lval a\<^sub>2 s)" |
+"lval (LET x a\<^sub>1 a\<^sub>2) s = lval a\<^sub>2 (s(x := lval a\<^sub>1 s))"
+
+fun inline :: "lexp \<Rightarrow> aexp" where
+"inline (Nl a) = N a" |
+"inline (Vl x) = V x" |
+"inline (Plusl a b) = Plus (inline a) (inline b)" |
+"inline (LET x a b) = subst x (inline a) (inline b)"
+
+lemma "aval (inline a) s = lval a s"
+  apply(induction a arbitrary: s)
+     apply(auto)
+  done
+
+(* 3.7 *)
 (* TODO *)
