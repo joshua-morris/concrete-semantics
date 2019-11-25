@@ -166,4 +166,62 @@ lemma "aval (inline a) s = lval a s"
   done
 
 (* 3.7 *)
+
+datatype bexp = Bc bool | Not bexp | And bexp bexp | Less aexp aexp
+
+fun bval :: "bexp \<Rightarrow> state \<Rightarrow> bool" where
+"bval (Bc v) s = v" |
+"bval (Not b) s = (\<not> bval b s)" |
+"bval (And b\<^sub>1 b\<^sub>2) s = (bval b\<^sub>1 s \<and> bval b\<^sub>2 s)" |
+"bval (Less a\<^sub>1 a\<^sub>2) s = (aval a\<^sub>1 s < aval a\<^sub>2 s)"
+
+fun not :: "bexp \<Rightarrow> bexp" where
+"not (Bc True) = Bc False" |
+"not (Bc False) = Bc True" |
+"not b = Not b"
+
+fun "and" :: "bexp \<Rightarrow> bexp \<Rightarrow> bexp" where
+"and (Bc True) b = b" |
+"and b (Bc True) = b" |
+"and (Bc False) b = Bc False" |
+"and b (Bc False) = Bc False" |
+"and b\<^sub>1 b\<^sub>2 = And b\<^sub>1 b\<^sub>2"
+
+fun less :: "aexp \<Rightarrow> aexp \<Rightarrow> bexp" where
+"less (N a) (N b) = Bc (a < b)" |
+"less a b = Less a b"
+
+fun Eq :: "aexp \<Rightarrow> aexp \<Rightarrow> bexp" where
+"Eq a b = And (Not (less a b)) (Not (less b a))"
+
+fun Le :: "aexp \<Rightarrow> aexp \<Rightarrow> bexp" where
+"Le a b = Not (And (Not (less a b)) (Not (Eq a b)))"
+
+lemma "bval (Eq a b) s = (aval a s =  aval b s)"
+  apply(induction a)
+    apply(induction b)
+      apply(auto)
+  done
+
+lemma "bval (Le a b) s = (aval a s \<le> aval b s)"
+  apply(induction a)
+    apply(induction b)
+      apply(auto)
+  done
+
+(* 3.8 *)
+
+datatype ifexp = Bc2 bool | If ifexp ifexp ifexp | Less2 aexp aexp
+
+fun ifval :: "ifexp \<Rightarrow> state \<Rightarrow> bool" where
+"ifval (Bc2 v) s = v" |
+"ifval (If a b c) s = (if (ifval a s) then (ifval b s) else (ifval c s))" |
+"ifval (Less2 a b) s = (aval a s < aval b s)"
+
+fun b2ifexp :: "bexp \<Rightarrow> ifexp" where
+"b2ifexp (Bc a) = Bc2 a" |
+"b2ifexp (Less a b) = Less2 a b" |
+"b2ifexp (Not a) = If (b2ifexp a) (Bc2 False) (Bc2 True)" |
+"b2ifexp (And a b) = If (b2ifexp a) (b2ifexp b) (Bc2 False)"
+
 (* TODO *)
