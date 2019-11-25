@@ -96,24 +96,31 @@ type_synonym val = int
 type_synonym state = "vname \<Rightarrow> val"
 
 fun aval :: "aexp \<Rightarrow> state \<Rightarrow> val" where
-"aval (N a) s = a" |
+"aval (N c) s = c" |
 "aval (V x) s = s x" |
-"aval (Plus a b) s = aval a s + aval b s"
+"aval (Plus c d) s = aval c s + aval d s"
 
-inductive aval_rel :: "aexp \<Rightarrow> state \<Rightarrow> val \<Rightarrow> bool" where
-ConstN: "aval_rel (N c) s c" |
-ValV: "aval_rel (V x) s (s x)" |
-PlusX: "aval_rel p s x \<Longrightarrow> aval_rel q s y \<Longrightarrow> aval_rel (Plus p q) s (x + y)"
+inductive rel_aval :: "aexp \<Rightarrow> state \<Rightarrow> val \<Rightarrow> bool" where
+ConstN: "rel_aval (N c) s c" |
+ValV: "rel_aval (V x) s (s x)" |
+PlusX: "rel_aval p s x \<Longrightarrow> rel_aval q s y \<Longrightarrow> rel_aval (Plus p q) s (x + y)"
 
-lemma aval_rel_aval: "aval_rel c s v \<Longrightarrow> aval c s = v"
-  apply(induction rule: aval_rel.induct)
-  sorry
+lemma aval_rel_aval: "rel_aval c s v \<Longrightarrow> aval c s = v"
+  apply(induction rule: rel_aval.induct)
+    apply(auto)
+  done
+  
+
+lemma aval_aval_rel: "aval c s = v \<Longrightarrow> rel_aval c s v"
+  apply(induction c arbitrary: v)
+    apply(auto intro: ConstN ValV PlusX)
+  done
+
+corollary "rel_aval c s v \<longleftrightarrow> aval c s = v"
+  apply(auto intro: aval_rel_aval aval_aval_rel)
+  done
+
+(* 4.7 *)
 (* TODO *)
-
-lemma aval_aval_rel: "aval c s = v \<Longrightarrow> aval_rel c s v"
-  sorry
-
-corollary "aval_rel c s v \<longleftrightarrow> aval c s = v"
-  sorry
   
   
