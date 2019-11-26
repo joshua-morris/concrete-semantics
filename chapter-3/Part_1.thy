@@ -279,10 +279,10 @@ lemma is_nnf_nnf : "is_nnf (nnf b)"
 fun or_below_and :: "pbexp \<Rightarrow> bool" where
 "or_below_and (VAR x) = True" |
 "or_below_and (NOT a) = or_below_and a" |
-"or_below_and (AND a b) = (or_below_and a \<and> or_below_and b)" |
-"or_below_and (OR (AND _ _) _) = False" |
-"or_below_and (OR _ (AND _ _)) = False" |
-"or_below_and (OR a b) = (or_below_and a \<and> or_below_and b)"
+"or_below_and (OR a b) = (or_below_and a \<and> or_below_and b)" |
+"or_below_and (AND (OR _ _) _) = False" |
+"or_below_and (AND _ (OR _ _)) = False" |
+"or_below_and (AND a b) = (or_below_and a \<and> or_below_and b)"
 
 fun is_dnf :: "pbexp \<Rightarrow> bool" where
 "is_dnf a = (is_nnf a \<and> or_below_and a)"
@@ -292,11 +292,31 @@ fun dist_AND :: "pbexp \<Rightarrow> pbexp \<Rightarrow> pbexp" where
 "dist_AND a (OR b\<^sub>1 b\<^sub>2) = OR (dist_AND a b\<^sub>1) (dist_AND a b\<^sub>2)" |
 "dist_AND a b = AND a b"
 
-lemma pbval_dist : "pbval (dist_AND b\<^sub>1 b\<^sub>2) s = pbval (AND b\<^sub>1 b\<^sub>2) s"
+lemma pbval_dist [simp] : "pbval (dist_AND b\<^sub>1 b\<^sub>2) s = pbval (AND b\<^sub>1 b\<^sub>2) s"
   apply(induction b\<^sub>1 b\<^sub>2 rule: dist_AND.induct)
      apply(auto)
   done
 
-lemma is_dnf_dist : "is_dnf a \<Longrightarrow> is_dnf b \<Longrightarrow> is_dnf (dist_AND a b)"
-  oops
-  
+lemma is_dnf_dist [simp] : "is_dnf a \<Longrightarrow> is_dnf b \<Longrightarrow> is_dnf (dist_AND a b)"
+  apply(induction a b rule: dist_AND.induct)
+    apply(auto)
+  done
+
+fun dnf_of_nnf :: "pbexp \<Rightarrow> pbexp" where
+"dnf_of_nnf (AND a b) = dist_AND (dnf_of_nnf a) (dnf_of_nnf b)" |
+"dnf_of_nnf (OR a b) = OR (dnf_of_nnf a) (dnf_of_nnf b)" |
+"dnf_of_nnf (VAR x) = VAR x" |
+"dnf_of_nnf (NOT a) = NOT (dnf_of_nnf a)"
+
+lemma "pbval (dnf_of_nnf b) s = pbval b s"
+  apply(induction b arbitrary: s)
+     apply(auto)
+  done
+
+lemma "is_nnf b \<Longrightarrow> is_dnf (dnf_of_nnf b)"
+  apply(induction b)
+     apply simp
+    apply (metis dnf_of_nnf.simps(3) dnf_of_nnf.simps(4) is_dnf.simps is_nnf.elims(2) nnf.simps(3) nnf.simps(7) or_below_and.simps(1) or_below_and.simps(2) pbexp.distinct(1) pbexp.distinct(10) pbexp.distinct(8))
+  using is_dnf_dist apply auto[1]
+  apply (simp add: is_nnf.simps(7) or_below_and.simps(3))
+  done
