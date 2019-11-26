@@ -285,4 +285,18 @@ fun or_below_and :: "pbexp \<Rightarrow> bool" where
 "or_below_and (OR a b) = (or_below_and a \<and> or_below_and b)"
 
 fun is_dnf :: "pbexp \<Rightarrow> bool" where
-"is_dnf a = (is_nnf a \<and> or_below_and a)" 
+"is_dnf a = (is_nnf a \<and> or_below_and a)"
+
+fun dist_AND :: "pbexp \<Rightarrow> pbexp \<Rightarrow> pbexp" where
+"dist_AND (OR a\<^sub>1 a\<^sub>2) b = OR (dist_AND a\<^sub>1 b) (dist_AND a\<^sub>2 b)" |
+"dist_AND a (OR b\<^sub>1 b\<^sub>2) = OR (dist_AND a b\<^sub>1) (dist_AND a b\<^sub>2)" |
+"dist_AND a b = AND a b"
+
+lemma pbval_dist : "pbval (dist_AND b\<^sub>1 b\<^sub>2) s = pbval (AND b\<^sub>1 b\<^sub>2) s"
+  apply(induction b\<^sub>1 b\<^sub>2 rule: dist_AND.induct)
+     apply(auto)
+  done
+
+lemma is_dnf_dist : "is_dnf a \<Longrightarrow> is_dnf b \<Longrightarrow> is_dnf (dist_AND a b)"
+  oops
+  
