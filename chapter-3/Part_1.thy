@@ -224,4 +224,65 @@ fun b2ifexp :: "bexp \<Rightarrow> ifexp" where
 "b2ifexp (Not a) = If (b2ifexp a) (Bc2 False) (Bc2 True)" |
 "b2ifexp (And a b) = If (b2ifexp a) (b2ifexp b) (Bc2 False)"
 
-(* TODO *)
+
+fun if2bexp :: "ifexp \<Rightarrow> bexp" where
+"if2bexp (Bc2 v) = Bc v" |
+"if2bexp (If a b c) = Not (And (Not (And (if2bexp a) (if2bexp b))) (Not (And (Not (if2bexp a)) (if2bexp c))))" |
+"if2bexp (Less2 a b) = Less a b"
+
+lemma "bval (if2bexp exp) s = ifval exp s"
+  apply(induction rule: if2bexp.induct)
+    apply(auto)
+  done
+
+lemma "ifval (b2ifexp exp) s = bval exp s"
+  apply(induction rule: b2ifexp.induct)
+     apply(auto)
+  done
+
+(* 3.9 *)
+
+datatype pbexp = VAR vname | NOT pbexp | AND pbexp pbexp | OR pbexp pbexp
+
+fun pbval :: "pbexp \<Rightarrow> (vname \<Rightarrow> bool) \<Rightarrow> bool" where
+"pbval (VAR x ) s = s x" |
+"pbval (NOT b) s = (\<not> pbval b s)" |
+"pbval (AND b1 b2) s = (pbval b1 s \<and> pbval b2 s)" |
+"pbval (OR b1 b2) s = (pbval b1 s \<or> pbval b2 s)"
+
+fun is_nnf :: "pbexp \<Rightarrow> bool" where
+"is_nnf (NOT (VAR _)) = True" |
+"is_nnf (NOT _) = False" |
+"is_nnf (VAR x) = True" |
+"is_nnf (AND a b) = (is_nnf a \<and> is_nnf b)" |
+"is_nnf (OR a b) = (is_nnf a \<and> is_nnf b)"
+
+fun nnf :: "pbexp \<Rightarrow> pbexp" where
+"nnf (NOT (AND a b)) = OR (nnf (NOT a)) (nnf (NOT b))" |
+"nnf (NOT (OR a b)) = AND (nnf (NOT a)) (nnf (NOT b))" |
+"nnf (NOT (NOT a)) = nnf a" |
+"nnf (AND a b) = AND (nnf a) (nnf b)" |
+"nnf (OR a b) = OR (nnf a) (nnf b)" |
+"nnf (NOT (VAR x)) = NOT (VAR x)" |
+"nnf (VAR x) = VAR x"
+
+lemma pbval_nnf : "pbval (nnf b) s = pbval b s"
+  apply(induction rule: nnf.induct)
+    apply(auto)
+  done
+
+lemma is_nnf_nnf : "is_nnf (nnf b)"
+  apply(induction b rule: nnf.induct)
+        apply(auto)
+  done
+
+fun or_below_and :: "pbexp \<Rightarrow> bool" where
+"or_below_and (VAR x) = True" |
+"or_below_and (NOT a) = or_below_and a" |
+"or_below_and (AND a b) = (or_below_and a \<and> or_below_and b)" |
+"or_below_and (OR (AND _ _) _) = False" |
+"or_below_and (OR _ (AND _ _)) = False" |
+"or_below_and (OR a b) = (or_below_and a \<and> or_below_and b)"
+
+fun is_dnf :: "pbexp \<Rightarrow> bool" where
+"is_dnf a = (is_nnf a \<and> or_below_and a)" 
