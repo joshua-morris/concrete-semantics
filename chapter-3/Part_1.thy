@@ -320,3 +320,46 @@ lemma "is_nnf b \<Longrightarrow> is_dnf (dnf_of_nnf b)"
   using is_dnf_dist apply auto[1]
   apply (simp add: is_nnf.simps(7) or_below_and.simps(3))
   done
+
+(* 3.10 *)
+
+datatype instr = LOADI val | LOAD vname | ADD
+
+type_synonym stack = "val list"
+
+fun exec1 :: "instr \<Rightarrow> state \<Rightarrow> stack \<Rightarrow> stack option" where
+"exec1 (LOADI n) _ stk = Some (n # stk)" |
+"exec1 ADD _ [] = None" |
+"exec1 ADD _ [a] = None" |
+"exec1 (LOAD x) s stk = Some (s(x) # stk)" |
+"exec1 ADD _ (j # i # stk) = Some ((i + j) # stk)"
+
+fun exec :: "instr list \<Rightarrow> state \<Rightarrow> stack \<Rightarrow> stack option" where
+"exec [] _ stk = Some stk" |
+"exec (i#is) s stk = (case (exec1 i s stk) of
+                      Some a \<Rightarrow> exec is s a |
+                      None \<Rightarrow> None)"
+
+fun comp :: "aexp \<Rightarrow> instr list" where
+"comp (N n) = [LOADI n]" |
+"comp (V x ) = [LOAD x ]" |
+"comp (Plus e\<^sub>1 e\<^sub>2) = comp e\<^sub>1 @ comp e\<^sub>2 @ [ADD]"
+
+lemma [simp] : "exec is\<^sub>1 s stk = Some a \<Longrightarrow> exec (is\<^sub>1 @ is\<^sub>2) s stk = exec is\<^sub>2 s a"
+  apply(induction is\<^sub>1 arbitrary: stk)
+   apply(auto simp add: option.split)
+  apply (metis option.case_eq_if option.simps(3))
+  done
+
+lemma "exec (comp a) s stk = Some (aval a s # stk)"
+  apply(induction a arbitrary: stk)
+    apply(auto)
+  done
+
+(* 3.11 *)
+
+type_synonym reg = nat
+
+datatype instr2 = LDI val reg | LD vname reg | ADD reg reg
+
+(* TODO *)
