@@ -121,6 +121,61 @@ corollary "rel_aval c s v \<longleftrightarrow> aval c s = v"
   done
 
 (* 4.7 *)
-(* TODO *)
-  
-  
+datatype instr = LOADI val | LOAD vname | ADD
+
+type_synonym stack = "val list"
+
+fun exec1 :: "instr \<Rightarrow> state \<Rightarrow> stack \<Rightarrow> stack option" where
+"exec1 (LOADI n) _ stk = Some (n # stk)" |
+"exec1 ADD _ [] = None" |
+"exec1 ADD _ [c] = None" |
+"exec1 (LOAD x) s stk = Some (s(x) # stk)" |
+"exec1 ADD _ (j # i # stk) = Some ((i + j) # stk)"
+
+fun exec :: "instr list \<Rightarrow> state \<Rightarrow> stack \<Rightarrow> stack option" where
+"exec [] _ stk = Some stk" |
+"exec (i#is) s stk = (case (exec1 i s stk) of
+                      Some c \<Rightarrow> exec is s c |
+                      None \<Rightarrow> None)"
+
+fun comp :: "aexp \<Rightarrow> instr list" where
+"comp (N n) = [LOADI n]" |
+"comp (V x ) = [LOAD x ]" |
+"comp (Plus e\<^sub>1 e\<^sub>2) = comp e\<^sub>1 @ comp e\<^sub>2 @ [ADD]"
+
+lemma [simp] : "exec is\<^sub>1 s stk = Some c \<Longrightarrow> exec (is\<^sub>1 @ is\<^sub>2) s stk = exec is\<^sub>2 s c"
+  apply(induction is\<^sub>1 arbitrary: stk)
+   apply(auto simp add: option.split)
+  apply (metis option.case_eq_if option.simps(3))
+  done
+
+lemma "exec (comp c) s stk = Some (aval c s # stk)"
+  apply(induction c arbitrary: stk)
+    apply(auto)
+  done
+
+inductive ok :: "nat \<Rightarrow> instr list \<Rightarrow> nat \<Rightarrow> bool" where
+okBase : "ok n [] n" |
+ok1 : "ok n is n' \<Longrightarrow> ok n (is @ [LOADI k]) (Suc n')" |
+ok2 : "ok n is n' \<Longrightarrow> ok n (is @ [LOAD x]) (Suc n')" |
+ok3 : "ok n is (Suc (Suc n')) \<Longrightarrow> ok n (is @ [ADD]) (Suc n')"
+
+lemma "ok 0 [LOAD k] (Suc 0)"
+  apply (induction k)
+   apply (metis append_self_conv2 ok.simps)
+  apply (metis append_eq_Cons_conv ok.simps ok2)
+  done
+
+lemma "ok 0 [LOAD x, LOADI v, ADD] (Suc 0)"
+  apply(induction x)
+  apply(induction v)
+    apply (metis append.left_neutral append_Cons ok1 ok2 ok3 okBase)
+   apply (metis append.left_neutral append_Cons ok.simps okBase)
+  apply (metis append.left_neutral append_Cons ok1 ok2 ok3 okBase)
+  done
+
+lemma "ok (Suc (Suc 0)) [LOAD x, ADD, ADD, LOAD y] (Suc (Suc 0))"
+  using ok.cases by force
+
+lemma "\<lbrakk> ok n is n'; length stk = n; exec is s stk = Some c \<rbrakk> \<Longrightarrow> length c = n'"
+  using ok.cases by force
